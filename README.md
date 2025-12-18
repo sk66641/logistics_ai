@@ -11,8 +11,11 @@ This project is a small end‑to‑end logistics intelligence demo:
 1. Create and activate a virtualenv (optional but recommended):
 
 ```bash
-git clone 
+git clone https://github.com/sk66641/logistics_ai.git
 cd logistics_ai
+```
+
+```bash
 python -m venv myenv
 source myenv/bin/activate
 ```
