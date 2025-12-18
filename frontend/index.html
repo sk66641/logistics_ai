@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics Command Center | AI Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --bg: #f3f4f6;
+            --card: #ffffff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top left, #e0f2fe 0, #f3f4f6 35%, #e5e7eb 100%);
+            margin: 0;
+            padding: 20px;
+            color: #1f2937;
+        }
+        
+        .container { max-width: 1120px; margin: 0 auto; }
+        
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 16px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        header p { color: #6b7280; }
+        .header-sub {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.08);
+            color: #1d4ed8;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+        }
+
+        /* Grid Layout */
+        .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; }
+        
+        /* Cards */
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        
+        /* Form Styling */
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; }
+        select, input { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; }
+        
+        button {
+            width: 100%; background: var(--primary); color: white; padding: 12px; border: none; 
+            border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem;
+        }
+        button:hover { background: #1d4ed8; }
+
+        /* Results Section */
+        #result-panel { display: none; } /* Hidden by default */
+        
+        .badge {
+            display: inline-block; padding: 6px 12px; border-radius: 20px; 
+            font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+        }
+        .badge-high { background: #fef2f2; color: var(--danger); border: 1px solid #fca5a5; }
+        .badge-low { background: #ecfdf5; color: var(--success); border: 1px solid #6ee7b7; }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-box { background: #f9fafb; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #e5e7eb; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; display: block; }
+        .stat-label { font-size: 0.85rem; color: #6b7280; }
+
+        .sla-good { color: var(--success); }
+        .sla-medium { color: #f97316; }
+        .sla-high { color: var(--danger); }
+
+        .recommendation-box { margin-top: 20px; padding: 15px; background: #eff6ff; border-left: 4px solid var(--primary); border-radius: 8px; }
+        .recommendation-text { font-weight: 600; color: #1e3a8a; }
+
+        .context-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #4b5563;
+        }
+        .context-pill {
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+        }
+
+        .subsection-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #6b7280;
+            margin-top: 22px;
+            margin-bottom: 6px;
+        }
+
+        .sim-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1.4fr;
+            gap: 14px;
+            margin-top: 10px;
+            align-items: flex-start;
+        }
+
+        .sim-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .sim-table th, .sim-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        .sim-table th {
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .sim-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+        }
+        .sim-tag-low {
+            background: #ecfdf5;
+            color: #15803d;
+        }
+        .sim-tag-high {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        /* Loader */
+        .loader { display: none; text-align: center; margin-top: 20px; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            header { flex-direction: column; align-items: flex-start; }
+            .dashboard { grid-template-columns: 1fr; }
+            .card { border-radius: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>📦 Intelligent Logistics Command Center</h1>
+            <div class="header-sub">
+                <p>Prescriptive AI for Supply Chain Optimization</p>
+                <span class="badge-pill">
+                    <span class="badge-dot"></span>
+                    Live what-if simulations for delivery delays
+                </span>
+            </div>
+        </div>
+        <div style="font-size: 0.8rem; text-align: right; color: #6b7280;">
+            <div>Built on FastAPI + ML models</div>
+            <div>Latency-sensitive, runs locally</div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <div class="card">
+            <h3>Shipment Details</h3>
+            <form id="prediction-form">
+                <label>Origin City</label>
+                <select id="origin">
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Kolkata">Kolkata</option>
+                    <option value="Chennai">Chennai</option>
+                </select>
+
+                <label>Destination City</label>
+                <select id="destination">
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Jaipur">Jaipur</option>
+                    <option value="Lucknow">Lucknow</option>
+                </select>
+
+                <label>Carrier</label>
+                <select id="carrier">
+                    <option value="Delhivery">Delhivery</option>
+                    <option value="Blue Dart">Blue Dart</option>
+                    <option value="DTDC">DTDC</option>
+                    <option value="India Post">India Post</option>
+                </select>
+
+                <label>Shipment Type</label>
+                <select id="shipmentType">
+                    <option value="B2B">B2B</option>
+                    <option value="B2C">B2C</option>
+                </select>
+
+                <label>Service Level</label>
+                <select id="serviceLevel">
+                    <option value="Standard">Standard</option>
+                    <option value="Express">Express</option>
+                    <option value="Same Day">Same Day</option>
+                </select>
+
+                <label>Mode</label>
+                <select id="mode">
+                    <option value="Road">Road</option>
+                    <option value="Air">Air</option>
+                </select>
+
+                <label>Priority</label>
+                <select id="priority">
+                    <option value="Normal">Normal</option>
+                    <option value="High">High</option>
+                </select>
+
+                <label>Package Weight (kg)</label>
+                <input type="number" id="packageWeightKg" min="0.1" step="0.1" placeholder="e.g. 2.5" />
+
+                <label>Promised SLA (Hours)</label>
+                <select id="slaHours">
+                    <option value="24">24 hours</option>
+                    <option value="36">36 hours</option>
+                    <option value="48" selected>48 hours</option>
+                    <option value="72">72 hours</option>
+                    <option value="96">96 hours</option>
+                </select>
+
+                <label>Dispatch Date</label>
+                <input type="date" id="date" required>
+
+                <button type="submit">🔮 Predict Risk</button>
+            </form>
+            <div class="loader" id="loader">Processing Live Environmental Data... ⏳</div>
+        </div>
+
+        <div class="card" id="result-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Prediction Analysis</h3>
+                <span id="risk-badge" class="badge"></span>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <span id="delay-prob" class="stat-value" style="color: var(--danger)">--</span>
+                    <span class="stat-label">Risk Probability</span>
+                </div>
+                <div class="stat-box">
+                    <span id="delay-time" class="stat-value">--</span>
+                    <span class="stat-label">Est. Delay (Hours)</span>
+                </div>
+                <div class="stat-box">
+                    <span id="sla-target" class="stat-value">--</span>
+                    <span class="stat-label">Promised SLA (Hours)</span>
+                </div>
+                <div class="stat-box">
+                    <span id="sla-status" class="stat-value">--</span>
+                    <span class="stat-label">SLA Breach Risk</span>
+                </div>
+            </div>
+
+            <div class="recommendation-box">
+                <div>💡 <strong>AI Recommendation:</strong></div>
+                <div id="ai-recommendation" class="recommendation-text">--</div>
+            </div>
+
+            <div class="context-row">
+                <div class="context-pill" id="weather-pill">🌦 Weather: --</div>
+                <div class="context-pill" id="traffic-pill">🚦 Traffic: --</div>
+            </div>
+
+            <div class="subsection-title">Risk driver breakdown</div>
+            <div style="margin-top: 10px;">
+                <canvas id="factorsChart"></canvas>
+            </div>
+
+            <div class="subsection-title">What-if: compare carriers</div>
+            <div class="sim-grid">
+                <div>
+                    <button type="button" id="simulate-btn" style="margin-top: 4px; font-size: 0.9rem;">📊 Run Multi-Carrier Simulation</button>
+                    <table class="sim-table" id="sim-table">
+                        <thead>
+                            <tr>
+                                <th>Carrier</th>
+                                <th>Risk</th>
+                                <th>Delay (hrs)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sim-table-body">
+                            <tr><td colspan="3" style="color:#9ca3af;">Run a simulation to compare options.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <canvas id="multiCarrierChart"></canvas>
+                </div>
+            </div>
+            
+            <p style="margin-top:15px; font-size: 0.9rem; color: #666;">
+                <strong>Primary Cause:</strong> <span id="primary-reason">--</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
