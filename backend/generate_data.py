@@ -128,7 +128,7 @@ def generate_logistics_data():
 
     df = pd.DataFrame(data)
     df.to_csv("backend/data/shipment_data.csv", index=False)
-    print(f"✅ Generated {NUM_SAMPLES} Indian shipment records in backend/data/shipment_data.csv")
+    print(f"Generated {NUM_SAMPLES} Indian shipment records in backend/data/shipment_data.csv")
 
 if __name__ == "__main__":
     generate_logistics_data()

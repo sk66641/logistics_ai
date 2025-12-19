@@ -121,7 +121,7 @@ function renderChart(factors) {
             },
             plugins: {
                 legend: { display: false },
-                title: { display: true, text: 'Risk Factor Breakdown (SHAP-style Explanation)' }
+                title: { display: true, text: 'Risk factors' }
             }
         }
     });
@@ -201,7 +201,7 @@ if (simulateBtn) {
                     },
                     plugins: {
                         legend: { display: false },
-                        title: { display: true, text: 'Carrier-wise Delay Risk Comparison' }
+                        title: { display: true, text: 'Delay risk by carrier' }
                     }
                 }
             });

@@ -1,52 +1,50 @@
-## Logistics AI – Delivery Delay & SLA Risk Simulator
+## Logistics AI – Delivery Delay Risk Predictor
 
-This project is a small end‑to‑end logistics intelligence demo:
+This project is a small end-to-end demo:
 
-- **Backend**: FastAPI + XGBoost + LightGBM models for delivery delay risk and delay hours.
-- **Frontend**: Single‑page dashboard (plain HTML/CSS/JS + Chart.js).
-- **Data**: Synthetic Indian shipment dataset with weather, traffic, SLA and shipment attributes.
+- Backend: FastAPI with XGBoost and LightGBM models that estimate delay risk and delay hours.
+- Frontend: One HTML page with Chart.js.
+- Data: Synthetic shipment data for India with weather, traffic, SLA, and shipment details.
 
-### 1. Environment setup
+### 1. Setup
 
-1. Create and activate a virtualenv (optional but recommended):
+1) Clone and enter the repo:
 
 ```bash
 git clone https://github.com/sk66641/logistics_ai.git
 cd logistics_ai
 ```
 
+2) (Optional) create a virtual env:
+
 ```bash
 python -m venv myenv
 source myenv/bin/activate
 ```
 
-2. Install Python dependencies:
+3) Install Python packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Generate synthetic data
+### 2. Make sample data
 
-This creates `backend/data/shipment_data.csv` with enriched shipment + environment features.
+Creates `backend/data/shipment_data.csv` with fake shipments plus weather and traffic columns.
 
 ```bash
 python backend/generate_data.py
 ```
 
-### 3. Train models
+### 3. Train the models
 
-This trains:
-
-- an **XGBoost classifier** to predict delay risk (0/1),
-- a **LightGBM regressor** to predict delay hours for delayed shipments,
-- and saves the one‑hot encoded feature columns.
+Trains an XGBoost classifier for delay risk and a LightGBM regressor for delay hours. It also saves the one-hot column list.
 
 ```bash
 python backend/model_training.py
 ```
 
-Artifacts are stored in `backend/models/`:
+Saved to `backend/models/`:
 
 - `classifier.joblib`
 - `regressor.joblib`
@@ -54,126 +52,83 @@ Artifacts are stored in `backend/models/`:
 
 ### 4. Run the API
 
-Start the FastAPI backend (served with Uvicorn):
+Start the FastAPI server (via Uvicorn):
 
 ```bash
 uvicorn backend.app:app --reload
 ```
 
-By default it listens on `http://127.0.0.1:8000`.
+Default URL: `http://127.0.0.1:8000`
 
-- Main prediction endpoint: `POST /predict`
-- Request body (JSON) includes:
+- Main endpoint: `POST /predict`
+- JSON body:
   - `Origin`, `Destination`, `Carrier`, `Date`
   - optional: `ShipmentType`, `ServiceLevel`, `Mode`, `Priority`, `PackageWeightKg`, `SLAHours`
 
 ### 5. Open the frontend
 
-The frontend is a static page in `frontend/`:
+The UI lives in `frontend/`:
 
 ```bash
 cd frontend
 python -m http.server 5500
 ```
 
-Then open `http://127.0.0.1:5500/index.html` in your browser.
+Then open `http://127.0.0.1:5500/index.html`.
 
-The page provides:
+Page features:
 
-- A **shipment form** with route, carrier, shipment type, service level, mode, priority, weight, SLA and date.
-- **Prediction dashboard** showing:
-  - Delay risk (%), estimated delay hours.
-  - Promised SLA (hours) and **SLA breach risk**.
-  - Context chips for weather and traffic.
-  - A bar chart showing relative impact of weather, traffic and carrier.
-- **What‑if simulator** to compare carriers for the same lane/date via multiple `/predict` calls.
+- A simple shipment form (route, carrier, shipment type, service level, mode, priority, weight, SLA, date).
+- A results area with delay risk %, delay hours, promised SLA, and SLA risk.
+- Weather and traffic notes plus a small bar chart for quick factors.
+- A what-if simulator to compare carriers for the same trip and date.
 
-### 6. Data Strategy & Feature Engineering (Prototype vs. Future)
+### 6. Data approach (today vs. later)
 
-This repo currently uses **synthetic data** for experimentation, but is designed to be swapped to real feeds later.
+Today the data is fake and generated locally. You can swap in real feeds later.
 
-#### Data Sources (Planned for production)
+Planned sources:
 
-- **Historical Logs:** Past shipment data (Origin, Destination, Carrier, Status) used for training.
-- **Live Environmental Data:** Real-time fetching of Weather (precipitation, visibility) and Traffic patterns via external APIs (e.g. maps + weather providers).
+- Past shipment logs (origin, destination, carrier, status).
+- Live weather and traffic from external APIs.
 
-#### Key Features Used
+Key features used:
 
-- **Static Features (already in prototype):** Route distance, carrier, shipment type (B2B/B2C), service level, mode, package weight, SLA hours.
-- **Dynamic Features (currently simulated, later real):**
-  - **Weather:** Rain intensity, heavy-rain vs. clear/fog/storm.
-  - **Traffic:** Congestion level bucket (Low/Medium/High/Jam) and its impact on delay.
-- **Derived Features (already in prototype):**
-  - **Seasonality:** Festival month indicator (e.g. Oct–Nov rush).
-  - **Temporal:** Month extracted from date; can be extended to weekday/weekend, hour-of-day.
+- Route distance, carrier, shipment type (B2B/B2C), service level, mode, priority, package weight, SLA hours.
+- Simulated weather (rain, heavy rain, fog, storm) and traffic (low to jam).
+- Season flag for festival months and month from the date (could add weekday or hour later).
 
----
+### 7. How the models work
 
-### 7. Model Logic
+Two steps:
 
-#### Two‑stage architecture
+1) Risk classifier (XGBoost): predicts if a shipment will be delayed and gives a probability.
+2) Delay regressor (LightGBM): for delayed shipments, predicts how many hours late.
 
-The system follows a **two‑stage prediction pattern**:
+The response includes risk score (percent), risk level (Low / Medium / High), estimated delay hours, and SLA risk (On track / Low / Medium / High).
 
-1. **Stage 1 – Risk classification (XGBoost)**
-   - **Question:** “Will this shipment be delayed?”
-   - **Output:** Binary class (On time vs. Delayed) + probability.
-2. **Stage 2 – Delay duration (LightGBM)**
-   - **Question:** “If delayed, by how many hours?”
-   - **Output:** Continuous value in hours, trained only on actually delayed shipments.
+### 8. Notes for a real build
 
-The prototype reports:
+- API latency: Getting weather/traffic for every call can be slow. Use async FastAPI endpoints, httpx, and short caching for repeat routes and time windows.
+- Class balance: Most shipments are on time. Use class weights or SMOTE and watch precision/recall.
+- Data freshness: Weather and traffic change fast. Cache results for a few minutes per route and time window, and log which version you used.
 
-- **Risk score** (percentage), **risk level** (Low / Medium / High),
-- **Estimated delay hours**,
-- **SLA breach risk** (On track / Low / Medium / High) based on delay vs. SLA.
+### 9. Possible next steps
 
-#### Explainability (Current vs. planned)
-
-- Current UI shows a **simple factor bar chart** (weather, traffic, carrier) as an intuitive explanation.
-- In a production version, we can plug in **SHAP (Shapley values)** on top of XGBoost/LightGBM to quantify how much each feature contributed to a specific prediction.
-
----
-
-### 8. Implementation Challenges & Planned Solutions
-
-These are **design notes for the real‑data version** of the system:
-
-1. **Handling API latency**
-   - **Problem:** Fetching weather/traffic data for every request can add 2–3 seconds.
-   - **Planned solution:** Use async `FastAPI` endpoints with `httpx` and short‑term caching for repeated lanes/time windows.
-
-2. **Data imbalance**
-   - **Problem:** In real shipment logs, most shipments are “On time”, making delays the minority class.
-   - **Planned solution:** Use techniques like **SMOTE** / class‑weighted loss during training, and carefully monitor precision/recall.
-
-3. **Real‑world consistency**
-   - **Problem:** Weather and traffic update quickly; naive re‑querying can cause noisy predictions and high API costs.
-   - **Planned solution:** Cache responses for a small TTL (e.g. 10 minutes) per (lane, time‑bucket) and log the versions of external data used.
-
----
-
-### 9. Future Scope & Roadmap
-
-Some ideas for growing this prototype into a fuller logistics intelligence platform:
-
-- **Real APIs:** Plug in production weather and traffic APIs instead of synthetic generators.
-- **GPS Integration:** In‑transit tracking for trucks, not just pre‑dispatch ETA at booking time.
-- **User Accounts & Roles:** Separate dashboards for **Admin**, **Planner**, and **Driver** views.
-- **Alerting:** Webhooks / email / WhatsApp alerts for high‑risk or SLA‑breach‑risk shipments.
-- **What‑if Playbooks:** Save scenario presets (e.g. “Festival Rush”, “Monsoon South India”) for planners to re‑use.
-- **Deeper Explainability:** Full SHAP‑based explanations and feature importance drill‑downs per lane/carrier.
-
----
+- Replace synthetic data with real weather and traffic APIs.
+- Add GPS or live truck tracking, not just ETA at booking.
+- Add user roles (Admin / Planner / Driver).
+- Send alerts (webhooks, email, WhatsApp) for high risk or likely SLA breaks.
+- Save common what-if setups (for example “Festival Rush”).
+- Add deeper explainability (e.g., SHAP) and feature importance per route or carrier.
 
 ### 10. Project structure
 
 - `backend/`
-  - `generate_data.py` – synthetic data generation.
-  - `model_training.py` – training and saving models.
+  - `generate_data.py` – makes synthetic data.
+  - `model_training.py` – trains and saves models.
   - `app.py` – FastAPI app and `/predict` endpoint.
 - `frontend/`
   - `index.html` – UI.
   - `script.js` – API calls and dashboard logic.
 - `requirements.txt` – Python dependencies.
-

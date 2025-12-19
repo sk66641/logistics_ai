@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logistics Command Center | AI Prediction</title>
+    <title>Delivery Delay Risk Predictor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -187,18 +187,17 @@
 <div class="container">
     <header>
         <div>
-            <h1>📦 Intelligent Logistics Command Center</h1>
+            <h1>📦 Delivery Delay Risk Predictor</h1>
             <div class="header-sub">
-                <p>Prescriptive AI for Supply Chain Optimization</p>
+                <p>Helper for delivery delays</p>
                 <span class="badge-pill">
                     <span class="badge-dot"></span>
-                    Live what-if simulations for delivery delays
+                    Prototype
                 </span>
             </div>
         </div>
         <div style="font-size: 0.8rem; text-align: right; color: #6b7280;">
             <div>Built on FastAPI + ML models</div>
-            <div>Latency-sensitive, runs locally</div>
         </div>
     </header>
 
@@ -274,12 +273,12 @@
 
                 <button type="submit">🔮 Predict Risk</button>
             </form>
-            <div class="loader" id="loader">Processing Live Environmental Data... ⏳</div>
+            <div class="loader" id="loader">Working... using sample weather and traffic data</div>
         </div>
 
         <div class="card" id="result-panel">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>Prediction Analysis</h3>
+                <h3>Prediction Results</h3>
                 <span id="risk-badge" class="badge"></span>
             </div>
 
@@ -303,7 +302,7 @@
             </div>
 
             <div class="recommendation-box">
-                <div>💡 <strong>AI Recommendation:</strong></div>
+                <div>💡 <strong>Suggested action:</strong></div>
                 <div id="ai-recommendation" class="recommendation-text">--</div>
             </div>
 
@@ -312,12 +311,12 @@
                 <div class="context-pill" id="traffic-pill">🚦 Traffic: --</div>
             </div>
 
-            <div class="subsection-title">Risk driver breakdown</div>
+            <div class="subsection-title">Why this risk</div>
             <div style="margin-top: 10px;">
                 <canvas id="factorsChart"></canvas>
             </div>
 
-            <div class="subsection-title">What-if: compare carriers</div>
+            <div class="subsection-title">Compare carriers</div>
             <div class="sim-grid">
                 <div>
                     <button type="button" id="simulate-btn" style="margin-top: 4px; font-size: 0.9rem;">📊 Run Multi-Carrier Simulation</button>
@@ -330,7 +329,7 @@
                             </tr>
                         </thead>
                         <tbody id="sim-table-body">
-                            <tr><td colspan="3" style="color:#9ca3af;">Run a simulation to compare options.</td></tr>
+                            <tr><td colspan="3" style="color:#9ca3af;">Run to compare carriers.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -340,7 +339,7 @@
             </div>
             
             <p style="margin-top:15px; font-size: 0.9rem; color: #666;">
-                <strong>Primary Cause:</strong> <span id="primary-reason">--</span>
+                <strong>Main reason:</strong> <span id="primary-reason">--</span>
             </p>
         </div>
     </div>

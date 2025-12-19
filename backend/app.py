@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI(title="Logistics Intelligence API")
+app = FastAPI(title="Delivery Delay Risk Predictor API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,11 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("⏳ Loading Models...")
+print("Loading models...")
 classifier = joblib.load("backend/models/classifier.joblib")
 regressor = joblib.load("backend/models/regressor.joblib")
 model_columns = joblib.load("backend/models/model_columns.joblib")
-print(f"✅ Models Loaded. Expecting {len(model_columns)} features.")
+print(f"Models loaded. Expecting {len(model_columns)} features.")
 
 class ShipmentRequest(BaseModel):
     Origin: str
@@ -108,17 +108,17 @@ def predict_delay(request: ShipmentRequest):
             else:
                 sla_status = "Low SLA Breach Risk"
         
-        reason = "Normal Conditions"
+        reason = "Normal conditions"
         if weather in ["Heavy Rain (Monsoon)", "Storm"]:
-            reason = f"Severe Weather Alert: {weather}"
+            reason = f"Heavy weather: {weather}"
         elif traffic == "Jam (Gridlock)":
-            reason = "Critical Traffic Congestion Detected"
+            reason = "Traffic jam on this route"
         elif risk_level == "High Risk":
-            reason = "Combination of Distance & Carrier History"
+            reason = "High risk due to distance and carrier history"
 
-        recommendation = "Proceed with Standard Dispatch"
+        recommendation = "Proceed with standard dispatch"
         if risk_level == "High Risk":
-            recommendation = "⚠️ Action Needed: Switch to Express Air or Change Carrier"
+            recommendation = "High risk: use express air or switch carrier"
 
         return {
             "prediction": {
