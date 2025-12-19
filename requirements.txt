@@ -9,3 +9,5 @@ shap
 joblib
 httpx
 pydantic
+xgboost
+lightgbm
