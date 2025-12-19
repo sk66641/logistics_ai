@@ -1,21 +1,2 @@
-# Python cache
 __pycache__/
-*.py[cod]
-*.pyo
-
-# Virtual env
 myenv/
-venv/
-.venv/
-
-# OS / editor noise
-.DS_Store
-Thumbs.db
-*.swp
-.vscode/
-.idea/
-
-# Model artifacts
-backend/models/*.joblib
-
-myenv
