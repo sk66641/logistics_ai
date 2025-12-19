@@ -3,7 +3,7 @@
 This project is a small end-to-end demo of a delivery delay prediction system.
 
 * **Backend:** FastAPI with XGBoost and LightGBM models to estimate delay risk and delay hours.
-* **Frontend:** A single HTML page using Chart.js.
+* **UI:** A single HTML page using Chart.js.
 * **Data:** Synthetic shipment data for India with weather, traffic, SLA, and shipment details.
 
 ---
@@ -37,7 +37,7 @@ pip install -r requirements.txt
 Start the FastAPI server:
 
 ```bash
-uvicorn backend.app:app --reload
+uvicorn app:app --reload
 ```
 
 Default URL: `http://127.0.0.1:8000`
@@ -48,10 +48,9 @@ Default URL: `http://127.0.0.1:8000`
 
 ---
 
-## 3. Open the frontend
+## 3. Open the ui
 
 ```bash
-cd frontend
 python -m http.server 5500
 ```
 

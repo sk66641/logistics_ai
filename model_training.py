@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, mean_absolute_error
 
 print("Loading data...")
-data = pd.read_csv("backend/data/shipment_data.csv")
+data = pd.read_csv("data/shipment_data.csv")
 
 print("Preprocessing features...")
 
@@ -18,7 +18,7 @@ y_reg = data["Delay_Hours"]
 X_encoded = pd.get_dummies(X)
 
 model_columns = list(X_encoded.columns)
-joblib.dump(model_columns, "backend/models/model_columns.joblib")
+joblib.dump(model_columns, "models/model_columns.joblib")
 print(f"Saved feature column list ({len(model_columns)} features)")
 
 print("\nTraining risk classifier (XGBoost)...")
@@ -42,7 +42,7 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f"✅ Classifier Accuracy: {accuracy * 100:.2f}%")
 
 # Save Classifier
-joblib.dump(classifier, "backend/models/classifier.joblib")
+joblib.dump(classifier, "models/classifier.joblib")
 
 # 4. TRAIN REGRESSOR (LightGBM)
 # This model answers: "How late will it be?"
@@ -71,6 +71,6 @@ mae = mean_absolute_error(y_test_reg, y_pred_reg)
 print(f"Regressor mean error: {mae:.2f} hours")
 
 # Save Regressor
-joblib.dump(regressor, "backend/models/regressor.joblib")
+joblib.dump(regressor, "models/regressor.joblib")
 
-print("\nDone. All models saved in 'backend/models/'")
+print("\nDone. All models saved in 'models/'")

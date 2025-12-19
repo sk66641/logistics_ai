@@ -20,9 +20,9 @@ app.add_middleware(
 )
 
 print("Loading models...")
-classifier = joblib.load("backend/models/classifier.joblib")
-regressor = joblib.load("backend/models/regressor.joblib")
-model_columns = joblib.load("backend/models/model_columns.joblib")
+classifier = joblib.load("models/classifier.joblib")
+regressor = joblib.load("models/regressor.joblib")
+model_columns = joblib.load("models/model_columns.joblib")
 print(f"Models loaded. Expecting {len(model_columns)} features.")
 
 class ShipmentRequest(BaseModel):
@@ -139,6 +139,6 @@ def predict_delay(request: ShipmentRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Run with: uvicorn backend.app:app --reload
+# Run with: uvicorn app:app --reload
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
