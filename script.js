@@ -9,12 +9,19 @@ let multiCarrierChart = null;
 let lastFormData = null;
 const API_URL = "https://logistics-ai-c5n9.onrender.com";
 
-
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     loader.style.display = 'block';
     resultPanel.style.display = 'none';
+
+    // Clear multi-carrier simulation data
+    const tableBody = document.getElementById('sim-table-body');
+    tableBody.innerHTML = `<tr><td colspan="3" style="color:#9ca3af;">Run to compare carriers.</td></tr>`;
+    if (multiCarrierChart) {
+        multiCarrierChart.destroy();
+        multiCarrierChart = null;
+    }
 
     const formData = {
         Origin: document.getElementById('origin').value,
