@@ -7,6 +7,8 @@ const simulateBtn = document.getElementById('simulate-btn');
 let chartInstance = null;
 let multiCarrierChart = null;
 let lastFormData = null;
+const API_URL = "https://logistics-ai-c5n9.onrender.com";
+
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ form.addEventListener('submit', async (e) => {
     lastFormData = { ...formData };
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/predict', {
+        const response = await fetch(`${API_URL}/predict`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
@@ -141,7 +143,7 @@ if (simulateBtn) {
         try {
             const requests = carriers.map(carrier => {
                 const payload = { ...lastFormData, Carrier: carrier };
-                return fetch('http://127.0.0.1:8000/predict', {
+                return fetch(`${API_URL}/predict`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

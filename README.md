@@ -50,6 +50,8 @@ Default URL: `http://127.0.0.1:8000`
 
 ## 3. Open the ui
 
+Replace the API_URL in `script.js` if needed.
+
 ```bash
 python -m http.server 5500
 ```
